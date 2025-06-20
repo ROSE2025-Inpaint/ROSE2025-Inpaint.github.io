@@ -1,1 +1,0 @@
-# ROSE2025-Inpaint.github.io
