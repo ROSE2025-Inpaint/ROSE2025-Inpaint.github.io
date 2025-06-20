@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="ROSE for Video Object Removal">
+  <meta name="keywords" content="ROSE, Video Inpainting, Video Completion, Object Removal, Diffusion Transformer">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ROSE for Video Object Removal</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+
+  </script> -->
+  <style>
+  .hr {width: 100%; height: 1px; margin: 48px 0; background-color: #d6dbdf;}
+  </style>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/bulma.min.css">
+  <link rel="stylesheet" href="./assets/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./assets/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./assets/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="./assets/css/index.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- custom css file  -->
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="./assets/css/twentytwenty.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<section class="hero banner">
+  <div class="hero-body">
+    <div class="container is-max-desktop head">
+      <div class="columns is-centered">
+        <div class="column has-text-centered head">
+          <div class="logo">
+          <a href="index.html">
+            <img src="./assets/images/rose_logo.png" onmouseover="this.src='./assets/images/rose_logo.png';" onmouseout="this.src='./assets/images/rose_logo.png';" width="160px">
+          </a>
+          </div>
+          <br>
+
+          <h1 class="title is-3 publication-title"> 
+            <font color="#ff0000">ROSE</font><font color="#ffffff">: </font><font color="#ff0000">R</font><font color="#ffffff">emove</font> <font color="#ff0000">O</font><font color="#ffffff">bjects with </font><font color="#ff0000">S</font><font color="#ffffff">ide</font> <font color="#ff0000">E</font><font color="#ffffff">ffects in Videos </font>
+          </h1>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href=""><font color="#ffffff">Chenxuan Miao</font></a><sup>1</sup>,&nbsp;&nbsp;</span>
+            <span class="author-block">
+              <a href=""><font color="#ffffff">Yutong Feng</font></a><sup>2*</sup>,&nbsp;&nbsp;</span>
+            <span class="author-block">
+              <a href=""><font color="#ffffff">Jianshu Zeng</font></a><sup>3</sup>,&nbsp;&nbsp;</span> 
+            <span class="author-block">
+              <a href="""><font color="#ffffff">Zixiang Gao</font></a><sup>3</sup>,&nbsp;&nbsp;</span>
+            <span class="author-block">
+              <a href="""><font color="#ffffff">Hantang Liu</font></a><sup>2</sup>,&nbsp;&nbsp;</span><br>
+            <span class="author-block">
+              <a href=""><font color="#ffffff">Yunfeng Yan</font></a><sup>1</sup>,&nbsp;&nbsp;</span>
+            <span class="author-block">
+              <a href=""><font color="#ffffff">Donglian Qi</font></a><sup>1</sup>,&nbsp;&nbsp;</span>
+            <span class="author-block">
+              <a href=""><font color="#ffffff">Xi Chen</font></a><sup>4</sup>,&nbsp;&nbsp;</span>
+            <span class="author-block">
+              <a href=""><font color="#ffffff">Bin Wang</font></a><sup>2</sup>,&nbsp;&nbsp;</span>
+            <span class="author-block">
+              <a href=""><font color="#ffffff">Hengshuang Zhao</font></a><sup>4</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Zhejiang University,&nbsp;&nbsp;</span>
+            <span class="author-block"><sup>2</sup>KunByte AI,&nbsp;&nbsp;</span>
+            <span class="author-block"><sup>3</sup>Peking University,&nbsp;&nbsp;</span>
+            <span class="author-block"><sup>4</sup>The University of Hong Kong</span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Under Review</span>
+            <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Project Leader</small></span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <!-- <span class="link-block">
+                <a href="./xx.pdf" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span> -->
+              <!-- arXiv Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2309.03897" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+
+              <!-- Code Link. -->
+              <span class="link-block"> 
+                <a href="https://github.com/sczhou/ProPainter" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+
+              <!-- Demo Link. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/spaces/sczhou/ProPainter" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <img src="./assets/images/hf.png">
+                  </span>
+                  <span>Demo</span>
+                </a>
+              </span>
+
+              <!-- Video Link. -->
+              <span class="link-block">
+                <a href="https://youtu.be/92EHfgCO5-Q" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- first row -->
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Shadow</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Shadow/example-2/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Shadow/example-2/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Shadow</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Shadow/example-7/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Shadow/example-7/output.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Shadow</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Shadow/example-9/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Shadow/example-9/output.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Common</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Common/example-14/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Common/example-14/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Common</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Common/example-15/masked.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Common/example-15/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556" default_offset_pct="0.35">
+            <div class="desc">Common</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Common/example-3/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Common/example-3/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+      </div>
+  </div>
+</section>
+
+<!-- second row -->
+<section class="hero is-light is-small">
+  <div class="hero-body second-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Reflection</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Reflection/example-1/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Reflection/example-1/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Reflection</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Reflection/example-2/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Reflection/example-2/output.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Reflection</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Reflection/example-4/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Reflection/example-4/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Translucent</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Translucent/example-4/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Translucent/example-4/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Translucent</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Translucent/example-5/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Translucent/example-5/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Translucent</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Translucent/example-8/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Translucent/example-8/output.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+
+      </div>
+  </div>
+</section>
+
+<!-- third row -->
+<section class="hero is-light is-small">
+  <div class="hero-body second-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Light Source</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Light_source/example-1/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Light_source/example-1/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Light Source</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Light_source/example-10/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Light_source/example-10/output.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Light Source</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Light_source/example-4/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Light_source/example-4/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Mirror</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Mirror/example-1/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Mirror/example-1/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Mirror</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Mirror/example-10/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Mirror/example-10/output.mp4" type="video/mp4">
+              </video> 
+            </div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="twentytwenty-container" data-orientation="horizontal" ratio="0.5556">
+            <div class="desc">Mirror</div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Mirror/example-2/masked.mp4" type="video/mp4">
+              </video> 
+            </div>
+            <div class="video">
+              <video muted autoplay="autoplay" loop="loop" width="100%">
+                <source src="https://metac-open.oss-cn-hangzhou.aliyuncs.com/kunbyte/open_source/rose/videos_reduced/Mirror/example-2/output.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+
+      </div>
+  </div>
+</section>
+
+<section class="teaser">
+  <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <!-- <div class="column is-four-fifths"> -->
+        <div class="column">
+          <div class="content has-text-justified">
+            <ol type="a">
+              <br>
+              <li> <b>Row 1</b>: Shadow and Common categories. </li>
+              <!-- <li> <b>Watermark Removal</b>: remove the watermark from a video. </li> -->
+              <li> <b>Row 2</b>: Reflection and Translucent categories. </li>
+              <li> <b>Row 3</b>: Light Source and Mirror categories. </li>
+            </ol>
+          </div>
+          <div class="hr"></div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+      <!-- <div class="column"> -->
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Video object removal has achieved advanced performance due to the recent success
+            of video generative models. However, when addressing the side effects of objects,
+            e.g., their shadows and reflections, existing works struggle to eliminate these
+            effects for the scarcity of paired video data as supervision. This paper presents
+            <b>ROSE</b>, termed <b>R</b>emove <b>O</b>bjects with <b>S</b>ide <b>E</b>ffects, a framework that systematically
+            studies the object’s effects on environment, which can be categorized into five
+            common cases: shadows, reflections, light, translucency and mirror. Given the
+            challenges of curating paired videos exhibiting the aforementioned effects, we
+            leverage a 3D rendering engine for synthetic data generation. We carefully construct
+            a fully-automatic pipeline for data preparation, which simulates a large-scale paired
+            dataset with diverse scenes, objects, shooting angles, and camera trajectories.
+            ROSE is implemented as an video inpainting model built on diffusion transformer.
+            To localize all object-correlated areas, the entire video is fed into the model
+            for reference-based erasing. Moreover, additional supervision is introduced to
+            explicitly predict the areas affected by side effects, which can be revealed through
+            the differential mask between the paired videos. To fully investigate the model
+            performance on various side effect removal, we presents a new benchmark, dubbed
+            ROSE-Bench, incorporating both common scenarios and the five special side
+            effects for comprehensive evaluation. Experimental results demonstrate that ROSE
+            achieves superior performance compared to existing video object erasing models
+            and generalizes well to real-world video scenarios.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Data preparation. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+      <!-- <div class="column"> -->
+        <h2 class="title is-3">Data Preparation Pipeline</h2>
+        <div class="content has-text-justified">
+          <p>
+            
+          </p>
+          <div class="column">
+            <img src="./assets/images/data_preparation_pipeline.png" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Data preparation. -->
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <!-- <div class="column is-four-fifths"> -->
+      <div class="column">
+        <h2 class="title is-3">Method</h2>
+        <div class="content has-text-justified">
+          <p>
+            In brief, ROSE is implemented as an inpainting model continued from the
+            foundation video generative models (the Wan2.1 model in this paper). Following the
+            general architecture in diffusion-based inpainting models, we extend the model input with
+            the original input video together with object masks. Distinguished from the typical setting that
+            multiply the mask onto input video, we directly feed the whole video to assist the understanding on
+            environment. The input masks, with precise boundary generated by 3D engine, are further augmented
+            to enhance model robustness. To better supervise the model to localize the subtle object-environment
+            interactions, we introduce an additional difference mask predictor to explicitly predict the side effect
+            areas.
+          </p>
+          <div class="column">
+            <img src="./assets/images/rose_pipeline.png" />
+          </div>
+        </div>
+        <!-- Paper video. -->
+          <div class="column">
+            <h2 class="title is-3">Video</h2>
+            <div class="publication-video">
+              <!-- <iframe src="https://www.youtube.com/embed/92EHfgCO5-Q?rel=0&amp;showinfo=0"
+                      frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> -->
+              <iframe src="assets/demo/demo.mp4" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@InProceedings{zhou2023propainter,
+      title     = {{ProPainter}: Improving Propagation and Transformer for Video Inpainting},
+      author    = {Zhou, Shangchen and Li, Chongyi and Chan, Kelvin C.K and Loy, Chen Change},
+      booktitle = {Proceedings of IEEE International Conference on Computer Vision (ICCV)},
+      year      = {2023}
+    }</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://arxiv.org/abs/2309.03897" target="_blank">
+        <i class="fas fa-file-pdf"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/sczhou/ProPainter" target="_blank">
+        <i class="fab fa-github"></i>
+      </a>
+      <a class="icon-link" href="https://huggingface.co/spaces/sczhou/ProPainter" target="_blank">
+        <img src="./assets/images/hf_black.png">
+      </a>
+      <a class="icon-link" href="https://youtu.be/92EHfgCO5-Q" target="_blank">
+        <i class="fab fa-youtube"></i>
+      </a>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <div class="columns is-centered"><p>
+            This website template is borrowed from <a href="https://github.com/nerfies/nerfies.github.io" target="_blank">Here</a>. 
+            Feel free to clone this website's <a href="https://github.com/sczhou/ProPainter_website" target="_blank">source code</a>.
+            Thank you!
+          </p></div>
+        </div>
+      </div>
+    </div>
+
+    <!--=================Visitor==========================-->
+    <div class="content has-text-centered" style="padding:0 0 0 0">
+      <img src='https://api.infinitescript.com/badgen/count?name=sczhou/ProPainter&ltext=Visitors&color=3977dd' alt='visitors'>
+    </div>
+
+  </div>
+</footer>
+
+  <!-- custom js file  -->
+  <!-- <script defer src="./assets/js/fontawesome.all.min.js"></script> -->
+  <script src="./assets/js/bulma-carousel.min.js"></script>
+  <script src="./assets/js/bulma-slider.min.js"></script>
+  <script src="./assets/js/index.js"></script>
+  <script src="./assets/js/jquery.event.move.js"></script>
+  <script src="./assets/js/jquery.twentytwenty.js"></script>
+  <script>
+  $(function(){
+    $(".twentytwenty-container").twentytwenty();
+    // $(".twentytwenty-container", "#results-carousel").twentytwenty({default_offset_pct: 0.5, ratio: 0.5});
+  });
+  </script>
+</body>
+</html>
